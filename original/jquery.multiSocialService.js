@@ -11,34 +11,85 @@
  *  + mixi check
  *  + mixi like
  *  + gree like
+ *  + tumblr
  * 
- * @author manji6 http://manjiro.net
- * @require jQuery
- * @licence MIT licence
+ * @author   Ryosuke Sawada as manji6 <http://manjiro.net>
+ * @requires jQuery
+ * @license  MIT licence
  *
  **/
 
- /**
-  * multiSocialService setting object
-  *
-  */
+/**
+ * multiSocialService setting object
+ *
+*/
 jQuery.multiSocialService = {
 	url:location.href,
 	useService:['twitter','facebookLike','hatenaBookmark','evernoteClip','mixiLike','greeLike'],
-	hatenaBookmark: {},
-	twitter: {},
+	hatenaBookmark: {
+		type:"horizontal"
+	},
+	twitter: {
+		type:'horizontal',
+		lang:'',
+		text:'',
+		via:''
+	},
 	facebook: {
-		like: {}
+		like: {
+			type:'button_count',
+			show_faces:'false',
+			color:'light',
+			width:100,
+			height:23,
+			lang:'',
+			ogp: {
+				title: document.title,
+				image: "",
+				description: "",
+				app_id: "",
+				type: "blog",
+				site_name: ""
+			}
+		}
 	},
 	evernote: {
-		clip: {}
+		clip: {
+			targetId: 'container',
+			name:'',
+			tag: '',
+			url: '',
+			noteTitle: $("title").text()
+		}
 	},
 	mixi: {
-		check: {},
-		like: {}
+		check: {
+			'data-key':'',
+			'data-url':'',
+			'data-button':'button-1'
+		},
+		like: {
+			href:"",
+			service_key:"",
+			width:"450",
+			height:"80",
+			show_faces:"false"
+		}
 	},
 	gree: {
-		like: {}
+		like: {
+			href:"",
+			service_key:"",
+			type:0,
+			height:20
+		}
+	},
+	tumblr: {
+		url:"",
+		setType:"link",
+		type:"vertical",
+		title:document.title,
+		description:$("meta:[name^='description']").attr("content")
 	}
 }
 
@@ -49,25 +100,28 @@ jQuery.fn.setMultiSocialService = function(option){
 		switch(jQuery.multiSocialService.useService[i]){
 			case "hatenaBookmark":
 				sInsertHtml += '<li class="multiSocialService-hatenaBookmark">'+jQuery("<li />").setHatenaBookmark(jQuery.multiSocialService.hatenaBookmark).html()+'</li>';
-				break;
+			break;
 			case "twitter":
 				sInsertHtml += '<li class="multiSocialService-twitter">'+jQuery("<li />").setTwitter(jQuery.multiSocialService.twitter).html()+'</li>';
-				break;
+			break;
 			case "facebookLike":
 				sInsertHtml += '<li class="multiSocialService-facebookLike">'+jQuery("<li />").setFacebookLike(jQuery.multiSocialService.facebook.like).html()+'</li>';
-				break;
+			break;
 			case "evernoteClip":
 				sInsertHtml += '<li class="multiSocialService-evernoteClip">'+jQuery("<li />").setEvernoteClip(jQuery.multiSocialService.evernote.clip).html()+'</li>';
-				break;
+			break;
 			case "mixiCheck":
 				sInsertHtml += '<li class="multiSocialService-mixiCheck">'+jQuery("<li />").setMixiCheck(jQuery.multiSocialService.mixi.check).html()+'</li>';
-				break;
+			break;
 			case "mixiLike":
 				sInsertHtml += '<li class="multiSocialService-mixiLike">'+jQuery("<li />").setMixiLike(jQuery.multiSocialService.mixi.like).html()+'</li>';
-				break;
+			break;
 			case "greeLike":
 				sInsertHtml += '<li class="multiSocialService-greeLike">'+jQuery("<li />").setGreeLike(jQuery.multiSocialService.gree.like).html()+'</li>';
-				break;
+			break;
+			case "tumblr":
+				sInsertHtml += '<li class="multiSocialService-tumblr">'+jQuery("<li />").setTumblr(jQuery.multiSocialService.tumblr).html()+'</li>';
+			break;
 		}
 	}
 	sInsertHtml += '</ul></div>';
@@ -76,22 +130,39 @@ jQuery.fn.setMultiSocialService = function(option){
 	return this;
 }
 
+
+/**
+ *
+ * common initialize process
+ * (ex.xss countermeasure)
+ **/
+jQuery.multiSocialService.initialize = function(option){
+
+	//xss countermeasure(url sanitize)
+	if(typeof option === 'string'){
+		option = encodeURIComponentRFC3986(decodeURIComponent(option));
+	}else{
+		option.url = encodeURIComponentRFC3986(decodeURIComponent(option.url));
+	}
+	return option;
+}
+
 /**
  * set HatenaBookmark
  * 
  * @param {Object} option setting object
- */
+*/
 jQuery.fn.setHatenaBookmark = function(option){
 
-	option = jQuery.extend(true,{type:"vertical"},option);
+	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.hatenaBookmark,option));
 
 	var htmlHatenaBookmark = '\
 	<a href="http://b.hatena.ne.jp/entry/'+jQuery.multiSocialService.url+'" \
-		class="hatena-bookmark-button" data-hatena-bookmark-layout="'+option.type+'" \
-		title="このエントリーをはてなブックマークに追加">\
-		<img src="http://b.st-hatena.com/images/entry-button/button-only.gif" \
-			alt="このエントリーをはてなブックマークに追加" width="20" height="20" \
-			style="border: none;" />\
+	class="hatena-bookmark-button" data-hatena-bookmark-layout="'+option.type+'" \
+	title="このエントリーをはてなブックマークに追加">\
+	<img src="http://b.st-hatena.com/images/entry-button/button-only.gif" \
+	alt="このエントリーをはてなブックマークに追加" width="20" height="20" \
+	style="border: none;" />\
 	</a>\
 	<script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>';
 
@@ -103,11 +174,11 @@ jQuery.fn.setHatenaBookmark = function(option){
  * set Twitter tweet button
  * 
  * @param {Object} option setting object
- */
+*/
 jQuery.fn.setTwitter = function(option){
 
-	option = jQuery.extend(true,{type:'horizontal',lang:'',text:'',via:''},option);
-	
+	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.twitter,option));
+
 
 	var htmlTweetButton = '<a href="http://twitter.com/share" data-url="'+jQuery.multiSocialService.url+'" class="twitter-share-button" data-count="'+option.type+'" data-via="'+option.via+'" data-text="'+option.text+'" data-lang="'+option.lang+'">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>';
 
@@ -121,14 +192,36 @@ jQuery.fn.setTwitter = function(option){
  * set Facebook like button
  * 
  * @param {Object} option setting object
- */
+*/
 jQuery.fn.setFacebookLike = function(option){
 
-	option = jQuery.extend(true,{type:'button_count',show_faces:'false',color:'light',width:100,height:23,lang:''},option);
+	//extended option.
+	option = jQuery.extend(true,{},jQuery.multiSocialService.facebook.like,option);
 
 	if(option.lang === 'en'){
 		option.lang = 'locale=en_US&';
 	}
+
+	//set tag "meta" for OGP
+	$("head").append("<meta property='og:title' content='"+option.ogp.title+"' />");
+	$("head").append("<meta property='og:url' content='"+jQuery.multiSocialService.url+"' />");
+	if(option.ogp.image){
+		$("head").append("<meta property='og:image' content='"+option.ogp.image+"' />");
+	}
+	if(option.ogp.description){
+		$("head").append("<meta property='og:description' content='"+option.ogp.description+"' />");
+	}
+	if(option.ogp.app_id){
+		$("head").append("<meta property='fb:app_id' content='"+option.ogp.app_id+"' />");
+	}
+	if(option.ogp.type){
+		$("head").append("<meta property='og:type' content='"+option.ogp.type+"' />");
+	}
+	if(option.ogp.site_name){
+		$("head").append("<meta property='og:site_name' content='"+option.ogp.site_name+"' />");
+	}
+
+	//attachment-post-thumbnail
 
 	var htmlFacebookLikeButton = "<iframe src='http://www.facebook.com/plugins/like.php?"+option.lang+"href="+encodeURIComponent(jQuery.multiSocialService.url)+"&amp;layout="+option.type+"&amp;show_faces="+option.show_faces+"&amp;width=450&amp;action=like&amp;font&amp;colorscheme="+option.color+"&amp;height=21' scrolling='no' frameborder='0' style='border:none; overflow:hidden; width:"+option.width+"px; height:"+option.height+"px;' allowTransparency='true'></iframe>";
 
@@ -142,10 +235,10 @@ jQuery.fn.setFacebookLike = function(option){
  * set EvernoteClip
  * 
  * @param {Object} option setting object
- */
+*/
 jQuery.fn.setEvernoteClip = function(option){
 
-	option = jQuery.extend(true,{targetId: 'container',name:'',tag: '',url: '',noteTitle: $("title").text()},option);
+	option = jQuery.extend(true,{},jQuery.multiSocialService.evernote.clip,option);
 
 	var htmlEvernoteClip = '<script type="text/javascript" src="http://static.evernote.com/noteit.js"></script><a href="#" onclick="Evernote.doClip({contentId:\''+option.targetId+'\',providerName:\''+option.name+'\',url:\''+option.url+'\',suggestTags:\''+option.tag+'\',title:\''+option.noteTitle+'\'}); return false;"><img src="http://static.evernote.com/article-clipper-jp.png" alt="Clip to Evernote" /></a>';
 
@@ -157,10 +250,10 @@ jQuery.fn.setEvernoteClip = function(option){
  * set mixi check button
  *
  * @param {Object} option parameter setting object
- */
+*/
 jQuery.fn.setMixiCheck = function(option){
-	
-	option = jQuery.extend(true,{'data-key':'','data-url':'','data-button':'button-1'},option);
+
+	option = jQuery.extend(true,{},jQuery.multiSocialService.mixi.check,option);
 
 	//if use "mixi like" button, required service_key.
 	if(option.data_key === ''){
@@ -170,7 +263,7 @@ jQuery.fn.setMixiCheck = function(option){
 
 
 	var htmlMixiCheck = '<a href="http://mixi.jp/share.pl" class="mixi-check-button" data-key="'+option['data-key']+'" data-url="'+option['data-url']+'" data-button="'+option['data-button']+'">mixiチェック</a>\
-	    <script type="text/javascript" src="http://static.mixi.jp/js/share.js"></script>\
+	<script type="text/javascript" src="http://static.mixi.jp/js/share.js"></script>\
 	';
 
 	$(this).html(htmlMixiCheck);
@@ -183,19 +276,20 @@ jQuery.fn.setMixiCheck = function(option){
  * set mixi like button
  *
  * @param {Object} option parameter setting object
- */
+*/
 jQuery.fn.setMixiLike = function(option){
-	
-	option = jQuery.extend(true,{href:jQuery.multiSocialService.url,service_key:"",width:"450",height:"80",show_faces:"false"},option);
+
+	option = jQuery.extend(true,jQuery.multiSocialService.mixi.like,option);
+	option.href = jQuery.multiSocialService.url;
 
 	//if use "mixi like" button, required service_key.
 	if(option.service_key === ""){
 		alert("plase set service_key.");
 		return false;
 	}
-	
+
 	var htmlMixiLike = '<iframe src="http://plugins.mixi.jp/favorite.pl?'+$.param(option)+'" \
-		 scrolling="no" frameborder="0"\ allowTransparency="true" style="border:0; overflow:hidden; width:'+option.width+'px; height:'+option.height+'px;"></iframe>\
+	scrolling="no" frameborder="0"\ allowTransparency="true" style="border:0; overflow:hidden; width:'+option.width+'px; height:'+option.height+'px;"></iframe>\
 	';
 
 	$(this).html(htmlMixiLike);
@@ -208,17 +302,68 @@ jQuery.fn.setMixiLike = function(option){
  * set gree like button
  *
  * @param {Object} option parameter setting object
- */
+*/
 jQuery.fn.setGreeLike = function(option){
-	
-	option = jQuery.extend(true,{href:jQuery.multiSocialService.url,service_key:"",type:0,height:20},option);
+
+	option = jQuery.extend(true,{},jQuery.multiSocialService.gree.like,option);
+	option.href = jQuery.multiSocialService.url;
 
 	var htmlGreeLike = '<iframe src="http://share.gree.jp/share?url='+option.href+'&type='+option.type+'&height='+option.height+'" \
-		scrolling="no" frameborder="0" marginwidth="0" marginheight="0" style="border:none; overflow:hidden; \
-		width:100px; height:'+option.height+'px;" allowTransparency="true">\
+	scrolling="no" frameborder="0" marginwidth="0" marginheight="0" style="border:none; overflow:hidden; \
+	width:100px; height:'+option.height+'px;" allowTransparency="true">\
 	</iframe>';
 
 	$(this).html(htmlGreeLike);
 
 	return this;
 }
+
+
+/**
+ * set tumblr button
+ * (未完成)
+ *
+ * @param {Object} option parameter setting object
+ **/
+jQuery.fn.setTumblr = function(option){
+
+	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.tumblr,option));
+	option.href = jQuery.multiSocialService.url;
+
+	//set type
+	var oParam = {};
+
+	switch(option.setType){
+
+		case 'link':
+			//option.url ? oParam.url = $.multiSocialService.initialize(option.url):null;
+			option.url ? oParam.url = option.url:null;
+			option.name ? oParam.name = option.title:null;
+			option.description ? oParam.description = option.description:null;
+		break;
+	}
+
+	var aHtmlTumblr = [];
+
+	aHtmlTumblr.push('<script type="text/javascript" src="http://platform.tumblr.com/v1/share.js"></script>');
+	aHtmlTumblr.push('<a href="http://www.tumblr.com/share/link?'+jQuery.param(oParam)+'" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:81px; height:20px; background:url(\'http://platform.tumblr.com/v1/share_1.png\') top left no-repeat transparent;">');
+	aHtmlTumblr.push('Share on Tumblr');
+	aHtmlTumblr.push('</a>');
+
+	$(this).html(aHtmlTumblr.join(''));
+
+	return this;
+}
+
+/**
+ * secure encodeURIComponent
+ * 
+ * @param {String} url
+ **/
+function encodeURIComponentRFC3986(str) {
+	return encodeURIComponent(str).
+		replace(/[!*'()]/g, function(p){
+		return "%" + p.charCodeAt(0).toString(16);
+	});
+}
+

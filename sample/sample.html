@@ -1,0 +1,34 @@
+<html> 
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>jQuery.multiSocialServiceのテストページ</title> 
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> 
+		<script type="text/javascript" src="../original/jquery.multiSocialService.js"></script> 
+		<script type="text/javascript"> 
+			$(function(){
+				$.multiSocialService.url = location.href;
+				$.multiSocialService.facebook.like.ogp.title = document.title;
+				$.multiSocialService.facebook.like.ogp.description = $("#container").text();
+				$.multiSocialService.facebook.like.ogp.site_name = "デジタル料理人";
+				
+				//サンプル用のmixiLikeサービスキー設定
+				$.multiSocialService.mixi.check['data-key'] = "bb90184f17a91c76c4c95e40cd2ae2341013dab8";
+				$.multiSocialService.mixi.like.service_key = "bb90184f17a91c76c4c95e40cd2ae2341013dab8";
+				$.multiSocialService.facebook.like.ogp.app_id = "136046209790921";
+				
+				$.multiSocialService.mixi.like.width = 100;
+				$.multiSocialService.mixi.like.height = 20;
+				$("#socialService").setMultiSocialService();
+			});
+		</script> 
+	</head> 
+	<body> 
+		<div id="container"> 
+			jQuery.multiSocialServiceのテストページです。<br> 
+			簡単に設置するならこんな感じで設置可能です。この下に設置されるはず。
+		</div> 
+		<h2>デフォルトで一発設置可能なボタン</h2>
+		<div id="socialService"></div> 
+	</body> 
+</html> 
+
