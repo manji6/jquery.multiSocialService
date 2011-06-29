@@ -1,29 +1,29 @@
-# ���Ŏn�߂�ƃR�����g�s
+# ←で始めるとコメント行
 
-# �T�u�f�B���N�g�����܂� hoge.dcu ���̃t�@�C���𖳎�������
-# �� *.dcu��Delphi�̃R���p�C���ς݃t�@�C��
+# サブディレクトリを含む hoge.dcu 等のファイルを無視したい
+# ※ *.dcuはDelphiのコンパイル済みファイル
 # *.dcu
 *.swp
 
-# �g�b�v�f�B���N�g����*.exe�t�@�C���݂̂𖳎��Ώۂɂ������Ȃ����A
-# �T�u�f�B���N�g���͖������Ȃ������̏ꍇ
+# トップディレクトリの*.exeファイルのみを無視対象にしたくなった、
+# サブディレクトリは無視しない方向の場合
 # /*.exe
 
-# tmp �f�B���N�g���܂邲�Ɩ����������ꍇ�B
-# �������Agit�̓f�B���N�g��������Ȃ��̂Ŏ��o�����Ƃ���
-# �����Atmp�������܂��B���ꂪ�s�s���Ȃ�΋�� tmp/.gitignore�����
+# tmp ディレクトリまるごと無視したい場合。
+# ただし、gitはディレクトリを扱わないので取り出したときに
+# 多分、tmpが消えます。それが不都合ならば空の tmp/.gitignoreを作り
 #  git add tmp/.gitignore
-# ���Ă��΂����͂��ł��B(�������匾��ꂽ�� -f ����)
+# してやればいいはずです。(もし文句言われたら -f つける)
 # tmp/
 
-# cache �f�B���N�g���̒��g�͖������������ǁA
-# �Ƃɂ��� .htaccess �͖����������Ȃ��ꍇ("!"�ŏ��O�ݒ�)
-# cache/ ���Ə��O�ݒ肪��肭�����Ȃ��̂���H�H
+# cache ディレクトリの中身は無視したいけど、
+# とにかく .htaccess は無視したくない場合("!"で除外設定)
+# cache/ だと除外設定が上手くいかないのが謎？？
 # cache/*.*
 # !.htaccess
 
-# *.o��C����̃R���p�C���ς݃t�@�C���Ȃ̂ł���Ȃ����ǁA
-# zlib/�ȉ���*.o�͂���Ȃ�(���O�w��)�Ȃ�ĂƂ�
+# *.oはC言語のコンパイル済みファイルなのでいらないけど、
+# zlib/以下の*.oはいるなあ(除外指定)なんてとき
 # *.o
 # !zlib/*.o
 
