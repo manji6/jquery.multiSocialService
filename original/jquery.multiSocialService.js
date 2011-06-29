@@ -11,7 +11,8 @@
  *  + mixi check
  *  + mixi like
  *  + gree like
- *  + tumblr
+ *  + Google +1
+ *  + tumblr(comming soon...)
  * 
  * @author   Ryosuke Sawada as manji6 <http://manjiro.net>
  * @requires jQuery
@@ -84,6 +85,14 @@ jQuery.multiSocialService = {
 			height:20
 		}
 	},
+	google:{
+		plus1: {
+			lang: "ja",
+			callback:"",
+			count:true,
+			size:"standard"
+		}
+	},
 	tumblr: {
 		url:"",
 		setType:"link",
@@ -119,9 +128,15 @@ jQuery.fn.setMultiSocialService = function(option){
 			case "greeLike":
 				sInsertHtml += '<li class="multiSocialService-greeLike">'+jQuery("<li />").setGreeLike(jQuery.multiSocialService.gree.like).html()+'</li>';
 			break;
-			case "tumblr":
-				sInsertHtml += '<li class="multiSocialService-tumblr">'+jQuery("<li />").setTumblr(jQuery.multiSocialService.tumblr).html()+'</li>';
+			case "googlePlus1":
+				sInsertHtml += '<li class="multiSocialService-googlePlus1">'+jQuery("<li />").setGooglePlus1(jQuery.multiSocialService.google.plus1).html()+'</li>';
 			break;
+/*
+//TODO comming soon.
+case "tumblr":
+sInsertHtml += '<li class="multiSocialService-tumblr">'+jQuery("<li />").setTumblr(jQuery.multiSocialService.tumblr).html()+'</li>';
+break;
+*/
 		}
 	}
 	sInsertHtml += '</ul></div>';
@@ -318,10 +333,28 @@ jQuery.fn.setGreeLike = function(option){
 	return this;
 }
 
+/**
+ * set google +1 button
+ *
+ * @param {Object} option parameter setting object
+ **/
+jQuery.fn.setGooglePlus1 = function(option){
+
+	option = jQuery.extend(true, {}, jQuery.multiSocialService.google.plus1,option);
+
+	var htmlGooglePlus1 = [];
+	htmlGooglePlus1.push('<script type="text/javascript" src="https://apis.google.com/js/plusone.js">{lang: "'+option.lang+'"}</script>');
+	htmlGooglePlus1.push('<g:plusone size="'+option.size+'" count="'+option.count+'" href="'+jQuery.multiSocialService.url+'" callback="'+option.callback+'"></g:plusone>');
+	$(this).html(htmlGooglePlus1.join(''));
+
+	return this;
+}
+
 
 /**
  * set tumblr button
- * (未完成)
+ * 
+ * TODO comming soon...
  *
  * @param {Object} option parameter setting object
  **/
@@ -338,9 +371,9 @@ jQuery.fn.setTumblr = function(option){
 		case 'link':
 			//option.url ? oParam.url = $.multiSocialService.initialize(option.url):null;
 			option.url ? oParam.url = option.url:null;
-			option.name ? oParam.name = option.title:null;
-			option.description ? oParam.description = option.description:null;
-		break;
+		option.name ? oParam.name = option.title:null;
+		option.description ? oParam.description = option.description:null;
+	break;
 	}
 
 	var aHtmlTumblr = [];
