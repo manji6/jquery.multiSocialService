@@ -90,7 +90,7 @@ jQuery.multiSocialService = {
 			lang: "ja",
 			callback:"",
 			count:true,
-			size:"standard"
+			size:""
 		}
 	},
 	tumblr: {
