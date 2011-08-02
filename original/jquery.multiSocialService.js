@@ -290,8 +290,7 @@ jQuery.fn.setMixiLike = function(option){
 	}
 
 	var htmlMixiLike = '<iframe src="http://plugins.mixi.jp/favorite.pl?'+$.param(option)+'" \
-	scrolling="no" frameborder="0"\ allowTransparency="true" style="border:0; overflow:hidden; width:'+option.width+'px; height:'+option.height+'px;"></iframe>\
-	';
+	scrolling="no" frameborder="0" allowTransparency="true" style="border:0; overflow:hidden; width:'+option.width+'px; height:'+option.height+'px;"></iframe>';
 
 	$(this).html(htmlMixiLike);
 
