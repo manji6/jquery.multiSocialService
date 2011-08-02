@@ -218,22 +218,8 @@ jQuery.fn.setFacebookLike = function(option){
 	}
 
 	//set tag "meta" for OGP
-	$("head").append("<meta property='og:title' content='"+option.ogp.title+"' />");
-	$("head").append("<meta property='og:url' content='"+jQuery.multiSocialService.url+"' />");
-	if(option.ogp.image){
-		$("head").append("<meta property='og:image' content='"+option.ogp.image+"' />");
-	}
-	if(option.ogp.description){
-		$("head").append("<meta property='og:description' content='"+option.ogp.description+"' />");
-	}
 	if(option.ogp.app_id){
 		$("head").append("<meta property='fb:app_id' content='"+option.ogp.app_id+"' />");
-	}
-	if(option.ogp.type){
-		$("head").append("<meta property='og:type' content='"+option.ogp.type+"' />");
-	}
-	if(option.ogp.site_name){
-		$("head").append("<meta property='og:site_name' content='"+option.ogp.site_name+"' />");
 	}
 
 	//attachment-post-thumbnail
@@ -350,6 +336,35 @@ jQuery.fn.setGooglePlus1 = function(option){
 	return this;
 }
 
+
+/**
+ * set OpenGraphProtocol
+ *
+ * @param {Object} option Parameter setting object
+ **/
+jQuery.setOGP = function(option){
+
+	option = jQuery.extend(true,{},{
+		title: document.title
+	},option);
+
+
+	//set tag "meta" for OGP
+	$("head").append("<meta property='og:title' content='"+option.title+"' />");
+	$("head").append("<meta property='og:url' content='"+jQuery.multiSocialService.url+"' />");
+	if(option.image){
+		$("head").append("<meta property='og:image' content='"+option.image+"' />");
+	}
+	if(option.description){
+		$("head").append("<meta property='og:description' content='"+option.description+"' />");
+	}
+	if(option.type){
+		$("head").append("<meta property='og:type' content='"+option.type+"' />");
+	}
+	if(option.site_name){
+		$("head").append("<meta property='og:site_name' content='"+option.site_name+"' />");
+	}
+}
 
 /**
  * set tumblr button
