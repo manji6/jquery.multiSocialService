@@ -195,7 +195,7 @@ jQuery.fn.setTwitter = function(option){
 	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.twitter,option));
 
 
-	var htmlTweetButton = '<a href="http://twitter.com/share" data-url="'+jQuery.multiSocialService.url+'" class="twitter-share-button" data-count="'+option.type+'" data-via="'+option.via+'" data-text="'+option.text+'" data-lang="'+option.lang+'">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>';
+	var htmlTweetButton = '<a href="http://twitter.com/share" data-url="'+jQuery.multiSocialService.url+'" class="twitter-share-button" data-count="'+option.type+'" data-via="'+option.via+'" data-text="'+option.text+'" data-lang="'+option.lang+'">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
 
 	$(this).html(htmlTweetButton);
 	return this;
@@ -241,7 +241,7 @@ jQuery.fn.setEvernoteClip = function(option){
 
 	option = jQuery.extend(true,{},jQuery.multiSocialService.evernote.clip,option);
 
-	var htmlEvernoteClip = '<script type="text/javascript" src="http://static.evernote.com/noteit.js"></script><a href="#" onclick="Evernote.doClip({contentId:\''+option.targetId+'\',providerName:\''+option.name+'\',url:\''+option.url+'\',suggestTags:\''+option.tag+'\',title:\''+option.noteTitle+'\'}); return false;"><img src="http://static.evernote.com/article-clipper-jp.png" alt="Clip to Evernote" /></a>';
+	var htmlEvernoteClip = '<script type="text/javascript" src="http://static.evernote.com/noteit.js" charset="utf-8"></script><a href="#" onclick="Evernote.doClip({contentId:\''+option.targetId+'\',providerName:\''+option.name+'\',url:\''+option.url+'\',suggestTags:\''+option.tag+'\',title:\''+option.noteTitle+'\'}); return false;"><img src="http://static.evernote.com/article-clipper-jp.png" alt="Clip to Evernote" /></a>';
 
 	$(this).html(htmlEvernoteClip);
 	return this;
@@ -264,7 +264,7 @@ jQuery.fn.setMixiCheck = function(option){
 
 
 	var htmlMixiCheck = '<a href="http://mixi.jp/share.pl" class="mixi-check-button" data-key="'+option['data-key']+'" data-url="'+option['data-url']+'" data-button="'+option['data-button']+'">mixiチェック</a>\
-	<script type="text/javascript" src="http://static.mixi.jp/js/share.js"></script>\
+	<script type="text/javascript" src="http://static.mixi.jp/js/share.js" charset="utf-8"></script>\
 	';
 
 	$(this).html(htmlMixiCheck);
@@ -328,7 +328,7 @@ jQuery.fn.setGooglePlus1 = function(option){
 	option = jQuery.extend(true, {}, jQuery.multiSocialService.google.plus1,option);
 
 	var htmlGooglePlus1 = [];
-	htmlGooglePlus1.push('<script type="text/javascript" src="https://apis.google.com/js/plusone.js">{lang: "'+option.lang+'"}</script>');
+	htmlGooglePlus1.push('<script type="text/javascript" src="https://apis.google.com/js/plusone.js" charset="utf-8">{lang: "'+option.lang+'"}</script>');
 	htmlGooglePlus1.push('<g:plusone size="'+option.size+'" count="'+option.count+'" href="'+jQuery.multiSocialService.url+'" callback="'+option.callback+'"></g:plusone>');
 	$(this).html(htmlGooglePlus1.join(''));
 
