@@ -250,6 +250,10 @@ jQuery.fn.setFacebookLike = function(option){
 		option.lang = 'locale=en_US&';
 	}
 
+	if($("meta").filter(function(){return $(this).attr("property") === "fb:app_id";}).attr("content") !== undefined){
+		option.ogp.app_id = $("meta").filter(function(){return $(this).attr("property") === "fb:app_id";}).attr("content");
+	}
+
 	//set tag "meta" for OGP
 	if(option.ogp.app_id){
 		$("head").append("<meta property='fb:app_id' content='"+option.ogp.app_id+"' />");
@@ -294,6 +298,10 @@ jQuery.fn.setFacebookLike = function(option){
 jQuery.fn.setFacebookComments = function(option){
 	//extended option.
 	option = jQuery.extend(true,{},jQuery.multiSocialService.facebook.comments,option);
+
+	if($("meta").filter(function(){return $(this).attr("property") === "fb:app_id";}).attr("content") !== undefined){
+		option.app_id = $("meta").filter(function(){return $(this).attr("property") === "fb:app_id";}).attr("content");
+	}
 
 	//set tag app_id
 	if(!option.app_id){
