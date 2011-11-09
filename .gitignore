@@ -27,4 +27,4 @@
 # *.o
 # !zlib/*.o
 
-
+*.DS_Store

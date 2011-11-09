@@ -31,10 +31,21 @@ jQuery.multiSocialService = {
 		type:"horizontal"
 	},
 	twitter: {
-		type:'horizontal',
-		lang:'',
-		text:'',
-		via:''
+		tweet:{
+			type:'horizontal',
+			lang:'',
+			text:'',
+			via:''
+		},
+		follow:{
+			user:'',
+			'data-button':'',
+			'data-text-color':'',
+			'data-link-color':'',
+			'show_count': 'true',
+			'lang': 'ja'
+		}
+
 	},
 	facebook: {
 		like: {
@@ -44,6 +55,7 @@ jQuery.multiSocialService = {
 			width:100,
 			height:23,
 			lang:'',
+			send: 'false',
 			ogp: {
 				title: document.title,
 				image: "",
@@ -52,6 +64,11 @@ jQuery.multiSocialService = {
 				type: "blog",
 				site_name: ""
 			}
+		},
+		comments: {
+			num_posts: "3",
+			width: "500",
+			app_id: ""
 		}
 	},
 	evernote: {
@@ -111,7 +128,7 @@ jQuery.fn.setMultiSocialService = function(option){
 				sInsertHtml += '<li class="multiSocialService-hatenaBookmark">'+jQuery("<li />").setHatenaBookmark(jQuery.multiSocialService.hatenaBookmark).html()+'</li>';
 			break;
 			case "twitter":
-				sInsertHtml += '<li class="multiSocialService-twitter">'+jQuery("<li />").setTwitter(jQuery.multiSocialService.twitter).html()+'</li>';
+				sInsertHtml += '<li class="multiSocialService-twitter">'+jQuery("<li />").setTwitter(jQuery.multiSocialService.twitter.tweet).html()+'</li>';
 			break;
 			case "facebookLike":
 				sInsertHtml += '<li class="multiSocialService-facebookLike">'+jQuery("<li />").setFacebookLike(jQuery.multiSocialService.facebook.like).html()+'</li>';
@@ -192,7 +209,7 @@ jQuery.fn.setHatenaBookmark = function(option){
 */
 jQuery.fn.setTwitter = function(option){
 
-	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.twitter,option));
+	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.twitter.tweet,option));
 
 
 	var htmlTweetButton = '<a href="http://twitter.com/share" data-url="'+jQuery.multiSocialService.url+'" class="twitter-share-button" data-count="'+option.type+'" data-via="'+option.via+'" data-text="'+option.text+'" data-lang="'+option.lang+'">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
@@ -202,6 +219,22 @@ jQuery.fn.setTwitter = function(option){
 
 }
 
+/**
+ * set Twitter follow button
+ * 
+ * @param {Object} option setting object
+*/
+jQuery.fn.setTwitterFollow = function(option){
+
+	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.twitter.follow,option));
+
+
+	var htmlFollowButton = '<a href="https://twitter.com/'+option.user+'" class="twitter-follow-button" data-show-count="'+option.show_count+'" data-button="'+option['data-button']+'" data-text-color="'+option['data-text-color']+'" data-link-color="'+option['data-link-color']+'" data-lang="'+option.lang+'">follow</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
+
+	$(this).html(htmlFollowButton);
+	return this;
+
+}
 
 /**
  * set Facebook like button
@@ -220,17 +253,76 @@ jQuery.fn.setFacebookLike = function(option){
 	//set tag "meta" for OGP
 	if(option.ogp.app_id){
 		$("head").append("<meta property='fb:app_id' content='"+option.ogp.app_id+"' />");
+
+		var aHtmlBodyTop = [];
+		aHtmlBodyTop.push('<div id="fb-root"></div>');
+		aHtmlBodyTop.push('<script>(function(d, s, id) {');
+		aHtmlBodyTop.push('  var js, fjs = d.getElementsByTagName(s)[0];');
+		aHtmlBodyTop.push('  if (d.getElementById(id)) {return;}');
+		aHtmlBodyTop.push('  js = d.createElement(s); js.id = id;');
+		aHtmlBodyTop.push('  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId='+option.ogp.app_id+'";');
+		aHtmlBodyTop.push('  fjs.parentNode.insertBefore(js, fjs);');
+		aHtmlBodyTop.push('}(document, "script", "facebook-jssdk"));</script>');
+
+		$('body').append(aHtmlBodyTop.join(""));
+		$('html').attr("xmlns:fb","http://ogp.me/ns/fb#");
+
+		var ahtmlFacebookLikeButton = [];
+		ahtmlFacebookLikeButton.push('<fb:like href="'+encodeURIComponent(jQuery.multiSocialService.url)+'"');
+		ahtmlFacebookLikeButton.push('send="'+option.send+'"');
+		ahtmlFacebookLikeButton.push('layout="'+option.type+'"');
+		ahtmlFacebookLikeButton.push('width="'+option.width+'"');
+		ahtmlFacebookLikeButton.push('show_faces="'+option.show_faces+'"');
+		ahtmlFacebookLikeButton.push('></fb:like>');
+
+		$(this).html(ahtmlFacebookLikeButton.join(" "));
+
+	}else{
+
+		var htmlFacebookLikeButton = "<iframe src='http://www.facebook.com/plugins/like.php?"+option.lang+"app_id="+option.ogp.app_id+"&href="+encodeURIComponent(jQuery.multiSocialService.url)+"&amp;layout="+option.type+"&amp;show_faces="+option.show_faces+"&amp;width=450&amp;action=like&amp;font&amp;colorscheme="+option.color+"&amp;height=21' scrolling='no' frameborder='0' style='border:none; overflow:hidden; width:"+option.width+"px; height:"+option.height+"px;' allowTransparency='true'></iframe>";
+		$(this).html(htmlFacebookLikeButton);
 	}
-
-	//attachment-post-thumbnail
-
-	var htmlFacebookLikeButton = "<iframe src='http://www.facebook.com/plugins/like.php?"+option.lang+"app_id="+option.ogp.app_id+"&href="+encodeURIComponent(jQuery.multiSocialService.url)+"&amp;layout="+option.type+"&amp;show_faces="+option.show_faces+"&amp;width=450&amp;action=like&amp;font&amp;colorscheme="+option.color+"&amp;height=21' scrolling='no' frameborder='0' style='border:none; overflow:hidden; width:"+option.width+"px; height:"+option.height+"px;' allowTransparency='true'></iframe>";
-
-	$(this).html(htmlFacebookLikeButton);
-
 	return this;
 }
 
+
+/**
+ * set Facebook comments
+ * 
+ * @param {Object} option setting object
+*/
+jQuery.fn.setFacebookComments = function(option){
+	//extended option.
+	option = jQuery.extend(true,{},jQuery.multiSocialService.facebook.comments,option);
+
+	//set tag app_id
+	if(!option.app_id){
+		return false;
+	}
+
+	var aHtmlBodyTop = [];
+	aHtmlBodyTop.push('<div id="fb-root"></div>');
+	aHtmlBodyTop.push('<script>(function(d, s, id) {');
+	aHtmlBodyTop.push('  var js, fjs = d.getElementsByTagName(s)[0];');
+	aHtmlBodyTop.push('  if (d.getElementById(id)) {return;}');
+	aHtmlBodyTop.push('  js = d.createElement(s); js.id = id;');
+	aHtmlBodyTop.push('  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId='+option.app_id+'";');
+	aHtmlBodyTop.push('  fjs.parentNode.insertBefore(js, fjs);');
+	aHtmlBodyTop.push('}(document, "script", "facebook-jssdk"));</script>');
+
+	$('body').append(aHtmlBodyTop.join(""));
+	$('html').attr("xmlns:fb","http://ogp.me/ns/fb#");
+
+	var aHtmlFacebookComments = [];
+	aHtmlFacebookComments.push('<fb:comments href="'+encodeURIComponent(jQuery.multiSocialService.url)+'"');
+	aHtmlFacebookComments.push('num_posts="'+option.num_posts+'"');
+	aHtmlFacebookComments.push('width="'+option.width+'"');
+	aHtmlFacebookComments.push('></fb:comments>');
+
+	$(this).html(aHtmlFacebookComments.join(" "));
+
+	return this;
+}
 
 /**
  * set EvernoteClip
@@ -320,6 +412,8 @@ jQuery.fn.setGreeLike = function(option){
 
 /**
  * set google +1 button
+ *
+ * TODO comming soon...
  *
  * @param {Object} option parameter setting object
  **/
