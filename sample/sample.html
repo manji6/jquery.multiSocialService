@@ -9,6 +9,7 @@
 				$.multiSocialService.facebook.like.ogp.description = $("#container").text();
 				$.multiSocialService.facebook.like.ogp.site_name = "デジタル料理人";
 				$.multiSocialService.url = "http://manjiro.net/";
+				$.multiSocialService.enableTracking = true;
 				
 				//サンプル用のmixiLikeサービスキー設定
 				$.multiSocialService.mixi.check['data-key'] = "bb90184f17a91c76c4c95e40cd2ae2341013dab8";
@@ -22,10 +23,47 @@
 					user: "manji6"
 				});
 				$("#addSocialServiceFacebookComments").setFacebookComments({
+					});
+
+				// LiteTweetボタン設定
+				$("a.Act_ShowTwitterTweetLite").setTwitterTweetLite({
+					url: 'http://manjiro.net',
+					via: 'manji6'
+				});
+				$("a.Act_ShowTwitterTweetLiteAnother").setTwitterTweetLite({
+					url: 'http://twitter.com'
+					});
+
+				// TweetCount取得
+				$.getTwitterTweetCount({
+					'url': 'http://manjiro.net/',
+					'callback': function(data){
+						$("span.count","#Area_TwitterTweetCount").text(data.count);
+					}
+				});
+
+				// LikeLiteボタン設定
+				$("a.Act_ShowFacebookLikeLite").setFacebookLikeLite({
+					url: 'http://manjiro.net/'
 				});
 				
+				// LikeCount取得
+				$.getFacebookCount({
+					'url': 'http://manjiro.net/',
+					'callback': function(data){
+						$("span.count","#Area_FacebookLikeCount").text(data.shares);
+					}
+				});
+
+				$("#addSocialServiceGooglePlus1").setGooglePlus1({});
+
 			});
 		</script> 
+		<style type="text/css">
+			div{
+				margin: 10px;
+			}
+		</style>
 	</head> 
 	<body> 
 		<div id="container"> 
@@ -39,6 +77,31 @@
 		<h2>追加設定で設置可能なボタン</h2>
 		<h3>Twitter FollowButton</h3>
 		<div id="addSocialServiceTwitterFollow"></div>
+		<div id="addSocialServiceGooglePlus1"></div>
+		<h3>簡易版Twitterツイートボタン</h3>
+		<div id="Area_TwitterTweetLite">
+			<ul>
+				<li><a href="javascript:void(0);" class="Act_showTwitterTweetLite">このリンクを押すと"http://manjiro.net/"についてTweetする画面がでます。(via @manji6)</a></li>
+				<li><a href="javascript:void(0);" class="Act_showTwitterTweetLite">このリンクも上と同じです。</a></li>
+				<li><a href="javascript:void(0);" class="Act_showTwitterTweetLiteAnother">このリンクは"Twitter.com"についてTweetする画面が出ます。</a></li>
+			</ul>
+		</div>
+		<h3>簡易版FacebookLikeボタン</h3>
+		<div id="Area_FacebookLikeLite">
+			<ul>
+				<li>
+					<a href="javascript:void(0);" class="Act_showFacebookLikeLite">このリンクを押すと、"http://manjiro.net/"についてLikeをします。</a>
+				</li>
+			</ul>
+		</div>
+		<h3>Tweet数取得</h3>
+		<div id="Area_TwitterTweetCount">
+			<p>http://manjiro.net/に関するTweetカウントは・・・<span class="count">取得中...<span></p>
+		</div>
+		<h3>Like数取得</h3>
+		<div id="Area_FacebookLikeCount">
+			<p>http://manjiro.net/に関するLikeカウントは・・・<span class="count">取得中...<span></p>
+		</div>
 		<h3>Facebook Comments</h3>
 		<div id="addSocialServiceFacebookComments"></div>
 	</body> 

@@ -21,12 +21,25 @@
  **/
 
 /**
+ * secure encodeURIComponent
+ * 
+ * @param {String} url
+ **/
+function encodeURIComponentRFC3986(str) {
+	return encodeURIComponent(str).
+		replace(/[!*'()]/g, function(p){
+			return "%" + p.charCodeAt(0).toString(16);
+		});
+}
+
+/**
  * multiSocialService setting object
  *
  */
 jQuery.multiSocialService = {
-	url:location.href,
+	url:encodeURIComponentRFC3986(location.href),
 	useService:['twitter','facebookLike','hatenaBookmark','evernoteClip','mixiLike','greeLike'],
+	enableTracking: false,
 	hatenaBookmark: {
 		type:"horizontal"
 	},
@@ -44,8 +57,11 @@ jQuery.multiSocialService = {
 			'data-link-color':'',
 			'show_count': 'true',
 			'lang': 'ja'
+		},
+		tweetLite:{
+			'text': '',
+			'via': ''
 		}
-
 	},
 	facebook: {
 		like: {
@@ -64,6 +80,8 @@ jQuery.multiSocialService = {
 				type: "blog",
 				site_name: ''
 			}
+		},
+		likeLite: {
 		},
 		comments: {
 			num_posts: "3",
@@ -109,13 +127,6 @@ jQuery.multiSocialService = {
 			count:true,
 			size:''
 		}
-	},
-	tumblr: {
-		url:'',
-		setType:"link",
-		type:"vertical",
-		title:document.title,
-		description:$("meta:[name^='description']").attr("content")
 	}
 }
 
@@ -148,12 +159,6 @@ jQuery.fn.setMultiSocialService = function(option){
 			case "googlePlus1":
 				sInsertHtml += '<li class="multiSocialService-googlePlus1">'+jQuery("<li />").setGooglePlus1(jQuery.multiSocialService.google.plus1).html()+'</li>';
 				break;
-				/*
-				//TODO comming soon.
-				case "tumblr":
-				sInsertHtml += '<li class="multiSocialService-tumblr">'+jQuery("<li />").setTumblr(jQuery.multiSocialService.tumblr).html()+'</li>';
-				break;
-				 */
 		}
 	}
 	sInsertHtml += '</ul></div>';
@@ -202,6 +207,10 @@ jQuery.fn.setHatenaBookmark = function(option){
 	return this;
 }
 
+
+// =====================================================================
+// Twitter 
+// =====================================================================
 /**
  * set Twitter tweet button
  * 
@@ -209,12 +218,24 @@ jQuery.fn.setHatenaBookmark = function(option){
  */
 jQuery.fn.setTwitter = function(option){
 
-	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.twitter.tweet,option));
+	option = jQuery.extend(true,{},jQuery.multiSocialService.twitter.tweet,option);
 
+	// set url
+	if(!($.type(option.url) === 'string' && option.url.length > 0)){
+		option.url = jQuery.multiSocialService.url;
+	}else{
+		option.url = encodeURIComponentRFC3986(option.url);
+	}
 
-	var htmlTweetButton = '<a href="http://twitter.com/share" data-url="'+jQuery.multiSocialService.url+'" class="twitter-share-button" data-count="'+option.type+'" data-via="'+option.via+'" data-text="'+option.text+'" data-lang="'+option.lang+'">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
+	var htmlTweetButton = '\
+						<a href="http://twitter.com/share" data-url="'+option.url+'" \
+						class="twitter-share-button" data-count="'+option.type+'" data-via="'+option.via+'" \
+						data-text="'+option.text+'" data-lang="'+option.lang+'">Tweet</a><script type="text/javascript"\
+						src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
 
 	$(this).html(htmlTweetButton);
+
+	jQuery.multiSocialService.tracking('twitter',option.url);
 	return this;
 
 }
@@ -229,13 +250,78 @@ jQuery.fn.setTwitterFollow = function(option){
 	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.twitter.follow,option));
 
 
-	var htmlFollowButton = '<a href="https://twitter.com/'+option.user+'" class="twitter-follow-button" data-show-count="'+option.show_count+'" data-button="'+option['data-button']+'" data-text-color="'+option['data-text-color']+'" data-link-color="'+option['data-link-color']+'" data-lang="'+option.lang+'">follow</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
+	var htmlFollowButton = '\
+		<a href="https://twitter.com/'+option.user+'" class="twitter-follow-button" \
+		data-show-count="'+option.show_count+'" data-button="'+option['data-button']+'"\
+		data-text-color="'+option['data-text-color']+'" data-link-color="'+option['data-link-color']+'" \
+		data-lang="'+option.lang+'">follow</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
 
 	$(this).html(htmlFollowButton);
 	return this;
 
 }
 
+/**
+ * set Twitter "Tweet" dialog event
+ * (this is deprecated method.)
+ * 
+ * @param {object}  option setting object
+ */
+jQuery.fn.setTwitterTweetLite = function(option){
+
+	option = jQuery.extend(true,{},jQuery.multiSocialService.twitter.tweetLite,option);
+
+	// set url
+	if(!($.type(option.url) === 'string' && option.url.length > 0)){
+		option.url = jQuery.multiSocialService.url;
+	}else{
+		option.url = encodeURIComponentRFC3986(option.url);
+	}
+
+
+	$(this).click(function(){
+		window.open("https://twitter.com/intent/tweet?"+(option.text !== '' ? 'text='+encodeURIComponentRFC3986(option.text) : '')+"&url="+option.url+(option.via !== '' ? '&via='+option.via : ''), "", "toolbar=0, status=0, width=650, height=360");
+
+		if(jQuery.multiSocialService.enableTracking === true){
+			_gaq.push(['_trackSocial', 'twitter', 'tweet']);
+		}
+
+	});
+
+}
+
+/**
+ *
+ * get Twitter "Tweet Count"
+ *
+ * @param {object} option setting object(url,callback)
+ */
+jQuery.getTwitterTweetCount = function(option){
+
+	// @param {String} s_url          取得先URL
+	// if url is not set, use "location.href"(current location)
+	var s_url = (jQuery.type(option.url) === 'string' ? option.url : decodeURIComponent(jQuery.multiSocialService.url));
+	
+	// get Tweet count(load json)
+	jQuery.ajax({
+		url: 'http://cdn.api.twitter.com/1/urls/count.json',
+		data: {
+			'url': s_url
+		},
+		dataType: 'jsonp',
+		cache: false,
+		success: function(data){
+			option.callback.call(this,data);
+		}
+	});
+};
+
+
+
+
+// =====================================================================
+// Facebook
+// =====================================================================
 /**
  * set Facebook like button
  * 
@@ -283,10 +369,20 @@ jQuery.fn.setFacebookLike = function(option){
 		$(this).html(sHtmlFacebookLikeButton);
 
 	}else{
-
-		var htmlFacebookLikeButton = "<iframe src='http://www.facebook.com/plugins/like.php?"+option.lang+"app_id="+option.ogp.app_id+"&href="+encodeURIComponent(jQuery.multiSocialService.url)+"&amp;layout="+option.type+"&amp;show_faces="+option.show_faces+"&amp;width=450&amp;action=like&amp;font&amp;colorscheme="+option.color+"&amp;height=21' scrolling='no' frameborder='0' style='border:none; overflow:hidden; width:"+option.width+"px; height:"+option.height+"px;' allowTransparency='true'></iframe>";
+		var htmlFacebookLikeButton = "<iframe src='http://www.facebook.com/plugins/like.php?"+option.lang+"\
+			app_id="+option.ogp.app_id+"\
+			&href="+encodeURIComponent(jQuery.multiSocialService.url)+"\
+			&amp;layout="+option.type+"\
+			&amp;show_faces="+option.show_faces+"\
+			&amp;width=450&amp;action=like&amp;font\
+			&amp;colorscheme="+option.color+"\
+			&amp;height=21' scrolling='no' frameborder='0' style='border:none; overflow:hidden; \
+			width:"+option.width+"px; height:"+option.height+"px;' allowTransparency='true'></iframe>";
 		$(this).html(htmlFacebookLikeButton);
 	}
+
+	jQuery.multiSocialService.tracking('facebook',option.url);
+	
 	return this;
 }
 
@@ -332,6 +428,60 @@ jQuery.fn.setFacebookComments = function(option){
 
 	return this;
 }
+
+
+/**
+ * set facebook "Like" dialog event
+ * (this is deprecated method.)
+ * 
+ * @param {object}  option setting object
+ */
+jQuery.fn.setFacebookLikeLite = function(option){
+
+	option = jQuery.extend(true,{},jQuery.multiSocialService.facebook.likeLite,option);
+
+	// set url
+	if(!($.type(option.url) === 'string' && option.url.length > 0)){
+		option.url = jQuery.multiSocialService.url;
+	}else{
+		option.url = encodeURIComponentRFC3986(option.url);
+	}
+
+
+	$(this).click(function(){
+		window.open("http://www.facebook.com/sharer.php?u="+option.url+"", "", "toolbar=0, status=0, width=900, height=500");
+		
+		if(jQuery.multiSocialService.enableTracking === true){
+			_gaq.push(['_trackSocial', 'facebook', 'like']);
+		}
+	});
+
+}
+
+/**
+ *
+ * get Facebook "Like Count"
+ *
+ * @param {object} option setting object(url,callback)
+ *
+ * callback function argument > arg:{"id": url, "shares": Like(Share) count, "comments": Comments count}
+ */
+jQuery.getFacebookCount = function(option){
+
+	// @param {String} s_url          取得先URL
+	// if url is not set, use "location.href"(current location)
+	var s_url = (jQuery.type(option.url) === 'string' ? option.url : decodeURIComponent(jQuery.multiSocialService.url));
+	
+	// get Tweet count(load json)
+	jQuery.ajax({
+		url: 'http://graph.facebook.com/'+s_url,
+		dataType: 'jsonp',
+		cache: false,
+		success: function(data){
+			option.callback.call(this,data);
+		}
+	});
+};
 
 /**
  * set EvernoteClip
@@ -422,18 +572,22 @@ jQuery.fn.setGreeLike = function(option){
 /**
  * set google +1 button
  *
- * TODO comming soon...
- *
  * @param {Object} option parameter setting object
  **/
 jQuery.fn.setGooglePlus1 = function(option){
 
 	option = jQuery.extend(true, {}, jQuery.multiSocialService.google.plus1,option);
+	// set url
+	if(!($.type(option.url) === 'string' && option.url.length > 0)){
+		option.url = jQuery.multiSocialService.url;
+	}else{
+		option.url = encodeURIComponentRFC3986(option.url);
+	}
 
 	var htmlGooglePlus1 = [];
 	var sHtmlGooglePlus1 = '';
 	sHtmlGooglePlus1 +='<script type="text/javascript" src="https://apis.google.com/js/plusone.js" charset="utf-8">{lang: "'+option.lang+'"}</script>';
-	sHtmlGooglePlus1 +='<g:plusone size="'+option.size+'" count="'+option.count+'" href="'+jQuery.multiSocialService.url+'" callback="'+option.callback+'"></g:plusone>';
+	sHtmlGooglePlus1 +='<g:plusone size="'+option.size+'" count="'+option.count+'" href="'+option.url+'" callback="'+option.callback+'"></g:plusone>';
 	$(this).html(sHtmlGooglePlus1);
 
 	return this;
@@ -473,51 +627,43 @@ jQuery.setOGP = function(option){
 }
 
 /**
- * set tumblr button
- * 
- * TODO comming soon...
+ * tracking
  *
- * @param {Object} option parameter setting object
- **/
-jQuery.fn.setTumblr = function(option){
+ * @param {String} media tracking media
+ * @param {String} url   target url
+ */
+jQuery.multiSocialService.tracking = function(media,url){
 
-	option = jQuery.multiSocialService.initialize(jQuery.extend(true,{},jQuery.multiSocialService.tumblr,option));
-	option.href = jQuery.multiSocialService.url;
-
-	//set type
-	var oParam = {};
-
-	switch(option.setType){
-
-		case 'link':
-			//option.url ? oParam.url = $.multiSocialService.initialize(option.url):null;
-			option.url ? oParam.url = option.url:null;
-			option.name ? oParam.name = option.title:null;
-			option.description ? oParam.description = option.description:null;
-			break;
+	if(jQuery.multiSocialService.enableTracking !== true && jQuery.type(_gaq) === 'undefined'){
+		return true;
 	}
 
-	var sHtmlTumblr = "";
+	if(media === 'facebook'){
+		fb = window.setInterval(function(){
+			if (typeof FB !== 'undefined') {
+				FB.Event.subscribe('edge.create', function(targetUrl) {
+					_gaq.push(['_trackSocial', 'facebook', 'like', targetUrl]);
+				});
+				FB.Event.subscribe('edge.remove', function(targetUrl) {
+					_gaq.push(['_trackSocial', 'facebook', 'unlike', targetUrl]);
+				});
+				FB.Event.subscribe('message.send', function(targetUrl) {
+					_gaq.push(['_trackSocial', 'facebook', 'send', targetUrl]);
+				});
+				clearInterval(fb);
+			}
+		},1000);
 
-	sHtmlTumblr +='<script type="text/javascript" src="http://platform.tumblr.com/v1/share.js"></script>';
-	sHtmlTumblr +='<a href="http://www.tumblr.com/share/link?'+jQuery.param(oParam)+'" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:81px; height:20px; background:url(\'http://platform.tumblr.com/v1/share_1.png\') top left no-repeat transparent;">';
-	sHtmlTumblr +='Share on Tumblr';
-	sHtmlTumblr +='</a>';
-
-	$(this).html(sHtmlTumblr);
-
-	return this;
+	}else if(media === 'twitter'){
+		tw = window.setInterval(function(){
+			if (typeof twttr !== 'undefined') {
+				twttr.events.bind('tweet', function(event) {
+					if (event) {
+						_gaq.push(['_trackSocial', 'twitter', 'tweet']);
+					}
+				});
+				clearInterval(tw);
+			}
+		},1000);
+	}
 }
-
-/**
- * secure encodeURIComponent
- * 
- * @param {String} url
- **/
-function encodeURIComponentRFC3986(str) {
-	return encodeURIComponent(str).
-		replace(/[!*'()]/g, function(p){
-			return "%" + p.charCodeAt(0).toString(16);
-		});
-}
-
