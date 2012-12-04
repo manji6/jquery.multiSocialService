@@ -634,7 +634,7 @@ jQuery.setOGP = function(option){
  */
 jQuery.multiSocialService.tracking = function(media,url){
 
-	if(jQuery.multiSocialService.enableTracking !== true && jQuery.type(_gaq) === 'undefined'){
+	if(jQuery.multiSocialService.enableTracking !== true && typeof _gaq === "undefined"){
 		return true;
 	}
 
