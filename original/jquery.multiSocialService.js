@@ -623,7 +623,7 @@ jQuery.setOGP = function(option){
 		sHtmlOGP +="<meta property='og:site_name' content='"+option.site_name+"' />";
 	}
 
-	$("head").append(aHtmlOGP);
+	$("head").append(sHtmlOGP);
 }
 
 /**
